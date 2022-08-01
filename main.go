@@ -19,33 +19,42 @@ var books = []Book{
 
 func main() {
 	r := gin.New()
-	r.GET("/", func(c *gin.Context) {
-		c.JSONP(http.StatusOK, books)
-	})
 
-	r.POST("/books", func(c *gin.Context) {
-		var book Book
-		if err := c.ShouldBindJSON(&book); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
-			return
-		}
-		books = append(books, book)
-		c.JSON(http.StatusCreated, book)
-	})
-
-	r.DELETE("/books/:id", func(c *gin.Context) {
-		id := c.Param("id")
-
-		for i, a := range books {
-			if a.ID == id {
-				books = append(books[:i], books[i+1:]...)
-				break
-			}
-		}
-	})
+	r.GET("/", listBooksHandler)
+	r.POST("/books", createBookHandler)
+	r.DELETE("/books/:id", deleteBookHandler)
 
 	r.Run()
+}
 
+func listBooksHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, books)
+}
+
+func createBookHandler(c *gin.Context) {
+	var book Book
+
+	if err := c.ShouldBindJSON(&book); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	books = append(books, book)
+
+	c.JSON(http.StatusCreated, book)
+}
+
+func deleteBookHandler(c *gin.Context) {
+	id := c.Param("id")
+
+	for i, a := range books {
+		if a.ID == id {
+			books = append(books[:i], books[i+1:]...)
+			break
+		}
+	}
+
+	c.Status(http.StatusNoContent)
 }
