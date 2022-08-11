@@ -34,9 +34,7 @@ func returnSingleArticles(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.URL.Path)
 	vars := mux.Vars(r)
 	key := vars["id"]
-
 	fmt.Fprintf(w, "key: "+key)
-
 	for _, article := range Articles {
 		if article.Id == key {
 			json.NewEncoder(w).Encode(article)
@@ -45,9 +43,8 @@ func returnSingleArticles(w http.ResponseWriter, r *http.Request) {
 }
 
 func createNewArticle(w http.ResponseWriter, r *http.Request) {
+	log.Println(r.URL.Path)
 	reqBody, _ := ioutil.ReadAll(r.Body)
-	//fmt.Println(reqBody)
-	//fmt.Fprintf(w, "%+v", string(reqBody))
 	var article Article
 	json.Unmarshal(reqBody, &article)
 	Articles = append(Articles, article)
@@ -57,7 +54,6 @@ func createNewArticle(w http.ResponseWriter, r *http.Request) {
 func deleteArticle(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id := vars["id"]
-
 	for index, article := range Articles {
 		if article.Id == id {
 			Articles = append(Articles[:index], Articles[index+1:]...)
@@ -68,7 +64,6 @@ func deleteArticle(w http.ResponseWriter, r *http.Request) {
 func requestHandler() {
 	myRouter := mux.NewRouter().StrictSlash(true)
 
-	//fmt.Println(myRouter)
 	myRouter.HandleFunc("/", homePage)
 	myRouter.HandleFunc("/articles", returnAllArticles)
 	myRouter.HandleFunc("/article", createNewArticle).Methods("POST")
@@ -80,10 +75,10 @@ func requestHandler() {
 
 func main() {
 	fmt.Println("Rest API v2.0 - Mux Routers")
-	Articles = []Article{
-		Article{Id: "1", Title: "Hello", Desc: "Article Description", Content: "Article Content"},
-		Article{Id: "2", Title: "Hello 2", Desc: "Article Description", Content: "Article Content"},
-	}
+	//Articles = []Article{
+	//	Article{Id: "1", Title: "Hello", Desc: "Article Description", Content: "Article Content"},
+	//	Article{Id: "2", Title: "Hello 2", Desc: "Article Description", Content: "Article Content"},
+	//}
 	requestHandler()
 
 }
